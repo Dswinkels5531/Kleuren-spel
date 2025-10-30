@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<title>🎨 Kleuren Combinatie Spel</title>
+<style>
+body {
+font-family: Arial, sans-serif; 
+text-align: center; 
+background: #f4f4f4; }
+h1 {
+margin-bottom: 10px;
+}
+select {
+margin: 5px;
+padding: 5px;
+font-size: 16px;
+}
+sellect, button {
+margin-top: 10px;
+padding: 10px 20px;
+font-size: 16px;
+cursor: pointer;   
+border: none;
+border-radius: 8px;
+background-color: #333;
+color: white;
+}
+button:hover {
+background-color: #555;
+}
+.resultaat {
+margin: 30px auto;          
+width: 300px;
+height: 150px;
+border: 2px solid #333;
+display: flex;              
+align-items: center;        
+justify-content: center;    
+font-weight: bold;
+font-size: 40px;
+color: #fff;
+border-radius: 50px;
+text-align: center;
+}
+.quiz {
+margin-top: 40px;
+padding: 20px;
+background: #fff;
+border-radius: 12px;
+width: 600px;
+margin-left: auto;
+margin-right: auto;
+box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+.vraag {
+margin: 8px 0;
+font-weight: bold;
+}
+.oplossing {
+color: green;
+font-weight: bold;
+}
+#finaleR {
+font-size: 200px;
+font-weight: bold;
+color: red;
+margin-top: 100px;
+display: none;
+}
+#restartBtn {
+margin-top: 20px;
+padding: 12px 24px;
+font-size: 18px;
+border: none;
+border-radius: 10px;
+background-color: #333;
+color: white;
+cursor: pointer;
+}
+#restartBtn:hover {
+background-color: #555;
+}
+</style>
+</head>
+<body>
+<h1>🎨 Kleuren Combinatie Spel</h1>
+<p>Kies twee kleuren om te mixen. Je kan dit onbeperkt proberen!</p>
+
+<label for="kleur1">Kleur 1:</label>
+<select id="kleur1">
+<option value="rood">Rood</option>
+<option value="geel">Geel</option>
+<option value="blauw">Blauw</option>
+<option value="paars">Paars</option>
+<option value="groen">Groen</option>
+<option value="orange">Oranje</option>
+</select>
+
+<label for="kleur2">Kleur 2:</label>
+<select id="kleur2">
+<option value="rood">Rood</option>
+<option value="geel">Geel</option>
+<option value="blauw">Blauw</option>
+<option value="paars">Paars</option>
+<option value="groen">Groen</option>
+<option value="orange">Oranje</option>
+</select>
+
+<br>
+<button onclick="mixKleuren()">🎨 Mix kleuren!</button>
+
+<div id="resultaat" class="resultaat"> 
+</div>
+
+<!-- QUIZ GEDEELTE -->
+<div class="quiz" id="quizBox">
+<h2>📝 Kleuren Quiz</h2>
+<div id="quizVragen"></div>
+
+<p id="quizFeedback"></p>
+<button onclick="controleerQuiz()">✅ Controleer</button>
+</div>
+
+<div id="finaleR">
+r  
+<br>
+<button id="restartBtn" onclick="location.reload()">🔄 Opnieuw Starten</button>
+</div>
+
+<script>
+const combinaties = {
+'roodrood':     { naam: 'Rood',         kleur: '#ff0000' },
+'roodgeel':     { naam: 'Oranje',       kleur: '#ffa500' },
+'roodblauw':    { naam: 'Paars',        kleur: '#800080' },
+'roodpaars':    { naam: 'Magenta',      kleur: '#c71585' },
+'roodgroen':    { naam: 'Bruin',        kleur: '#a52a2a' },
+'roodorange':   { naam: 'Rood-Oranje',  kleur: '#ff4500' },
+
+'geelrood':     { naam: 'Oranje',       kleur: '#ffa500' },
+'geelgeel':     { naam: 'Geel',         kleur: '#ffff00' },
+'geelblauw':    { naam: 'Groen',        kleur: '#008000' },
+'geelpaars':    { naam: 'Olijfbruin',   kleur: '#8b5a2b' },
+'geelgroen':    { naam: 'Limoen',       kleur: '#9acd32' },
+'geelorange':   { naam: 'Geel-Oranje',  kleur: '#ffd200' },
+
+'blauwrood':    { naam: 'Paars',        kleur: '#800080' },
+'blauwgeel':    { naam: 'Groen',        kleur: '#008000' },
+'blauwblauw':   { naam: 'Blauw',        kleur: '#0000ff' },
+'blauwpaars':   { naam: 'Indigo',       kleur: '#4b0082' },
+'blauwgroen':   { naam: 'Turquoise',    kleur: '#40e0d0' },
+'blauworange':  { naam: 'Bruin',        kleur: '#a52a2a' },
+
+'paarsrood':    { naam: 'Magenta',      kleur: '#c71585' },
+'paarsgeel':    { naam: 'Olijfbruin',   kleur: '#8b5a2b' },
+'paarsblauw':   { naam: 'Indigo',       kleur: '#4b0082' },
+'paarspaars':   { naam: 'Paars',        kleur: '#800080' },
+'paarsgroen':   { naam: 'Donkergrijs',  kleur: '#404040' },
+'paarsorange':  { naam: 'Rood-Bruin',   kleur: '#a0522d' },
+
+'groenrood':    { naam: 'Bruin',        kleur: '#a52a2a' },
+'groengeel':    { naam: 'Limoen',       kleur: '#9acd32' },
+'groenblauw':   { naam: 'Turquoise',    kleur: '#40e0d0' },
+'groenpaars':   { naam: 'Donkergrijs',  kleur: '#404040' },
+'groengroen':   { naam: 'Groen',        kleur: '#008000' },
+'groenorange':  { naam: 'Olijfgroen',   kleur: '#556b2f' },
+
+'orangerood':   { naam: 'Rood-Oranje',  kleur: '#ff4500' },
+'orangegeel':   { naam: 'Geel-Oranje',  kleur: '#ffd200' },
+'orangeblauw':  { naam: 'Bruin',        kleur: '#a52a2a' },
+'orangepaars':  { naam: 'Rood-Bruin',   kleur: '#a0522d' },
+'orangegroen':  { naam: 'Olijfgroen',   kleur: '#556b2f' },
+'orangeorange': { naam: 'Oranje',       kleur: '#ffa500' }
+};
+
+function mixKleuren() {
+const k1 = document.getElementById("kleur1").value;
+const k2 = document.getElementById("kleur2").value;
+const resultaatDiv = document.getElementById("resultaat");
+const key = k1 + k2;
+const combinatie = combinaties[key];
+
+if (combinatie) {
+resultaatDiv.style.backgroundColor = combinatie.kleur;
+resultaatDiv.style.color = (combinatie.kleur === "#ecf428" || combinatie.kleur === "#FFA500" || combinatie.kleur === "#ef9c09") ? "#000" : "#fff"; 
+resultaatDiv.textContent = combinatie.naam;
+} else {
+resultaatDiv.style.backgroundColor = "#fff";
+resultaatDiv.style.color = "#000";
+resultaatDiv.textContent = "❓ Onbekende mix";
+}
+}
+
+// QUIZ VRAGEN (met combinaties, volgorde maakt niet uit, geen dubbele kleuren)
+const quizVragen = [
+{ vraag: "Hoe maak je Groen?", antwoord: "Groen", combinatie: ["geel","blauw"] },
+{ vraag: "Hoe maak je Oranje?", antwoord: "Oranje", combinatie: ["rood","geel"] },
+{ vraag: "Hoe maak je Paars?", antwoord: "Paars", combinatie: ["rood","blauw"] },
+{ vraag: "Hoe maak je Bruin?", antwoord: "Bruin", combinatie: ["rood","groen"] },
+{ vraag: "Hoe maak je Magenta?", antwoord: "Magenta", combinatie: ["rood","paars"] },
+{ vraag: "Hoe maak je Turquoise?", antwoord: "Turquoise", combinatie: ["groen", "blauw"] }
+];
+
+let opgelosteVragen = {};
+
+// toon vragen in een rij
+const quizDiv = document.getElementById("quizVragen");
+quizVragen.forEach((q, i) => {
+const p = document.createElement("p");
+p.className = "vraag";
+p.id = "vraag"+i;
+p.textContent = q.vraag + " = ...";
+quizDiv.appendChild(p);
+});
+
+function controleerQuiz() {
+const k1 = document.getElementById("kleur1").value;
+const k2 = document.getElementById("kleur2").value;
+
+if (k1 === k2) return; 
+
+quizVragen.forEach((q, i) => {
+if (!opgelosteVragen[i]) {
+const [c1, c2] = q.combinatie;
+if ((k1 === c1 && k2 === c2) || (k1 === c2 && k2 === c1)) {
+opgelosteVragen[i] = true;
+document.getElementById("vraag"+i).textContent = q.vraag + " = " + c1 + " + " + c2; document.getElementById("vraag"+i).classList.add("oplossing");
+}}});
+if (Object.keys(opgelosteVragen).length === quizVragen.length) {
+document.getElementById("quizBox").style.display = "none";
+document.getElementById("resultaat").style.display = "none";
+document.getElementById("finaleR").style.display = "block";
+}
+}
+</script>
+</body>
+</html>
